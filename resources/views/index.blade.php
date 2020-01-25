@@ -14,21 +14,31 @@
 <body>
     <div class="container">
         <h1>LTV Sagatavošanās darbs</h1>
-        <form>
-            <div class="form-group">
+
+        @include('inc/messages')
+
+        <form action="/store" method="post">
+
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+            <div class="form-group" {{ $errors->has('name') ? 'has-error' : ''}}>
                 <label for="name">Vārds</label>
-                <input type="text" class="form-control" id="name">
+                <input name="name" type="text" class="form-control" id="name" value="{{ old('name') }}">
+                {!! $errors->first('name', '<p class="alert-danger">:message</p>') !!}
             </div>
-            <div class="form-group">
+            <div class="form-group" {{ $errors->has('surname') ? 'has-error' : ''}}>
                 <label for="surname">Uzvārds</label>
-                <input type="text" class="form-control" id="surname">
+                <input name="surname" type="text" class="form-control" id="surname" value="{{ old('surname') }}">
+                {!! $errors->first('surname', '<p class="alert-danger">:message</p>') !!}
             </div>
-            <div class="form-group">
+            <div class="form-group" {{ $errors->has('birth-date') ? 'has-error' : ''}}>
                 <label for="birth-date">Dzimšanas datums</label>
-                <input type="text" class="form-control datepicker" id="birth-date">
+                <input name="birth-date" type="text" class="form-control datepicker"
+                       id="birth-date" value="{{ old('birth-date') }}" data-date-end-date="0d">
+                {!! $errors->first('birth-date', '<p class="alert-danger">:message</p>') !!}
             </div>
             <div class="custom-file">
-                <input type="file" class="custom-file-input" id="customFileLang" lang="ru">
+                <input name="image" type="file" class="custom-file-input" id="customFileLang" lang="ru">
                 <label class="custom-file-label" for="customFileLang">Pievienojiet attēlu</label>
             </div>
             <button type="submit" class="btn btn-primary" style="margin-top: 20px">Submit</button>
@@ -37,7 +47,9 @@
 
     <script type="text/javascript">
         $(function () {
-            $('.datepicker').datepicker();
+            $('.datepicker').datepicker({
+                format: 'dd/mm/yyyy',
+            });
         });
     </script>
 </body>
