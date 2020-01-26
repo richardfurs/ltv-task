@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Rules\AgeValidation;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class FormController extends Controller
 {
@@ -32,25 +32,40 @@ class FormController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function store(Request $request)
     {
-        $name = $request->input('name');
-        $surname = $request->input('surname');
-        $dob = $request->input('birth-date');
 
-        $valMessage = [
-            'required' => 'Lūdzu ievadiet datus',
-        ];
+        $inputData = $request->only(['name', 'surname', 'birth_date']);
 
+        //VALIDATION
         $this->validate($request, [
             'name' => 'required',
             'surname' => 'required',
-            'birth-date' => ['required', new AgeValidation()],
-        ], $valMessage);
+            'birth_date' => ['required', new AgeValidation()],
+            'image' => 'required|image|size:2048',
+        ]);
 
-        return 123;
+
+        //ADDING PERSON INFO INTO JSON
+        $imgHash = $request->image->hashName();
+        $inputData['image'] = $imgHash;
+
+        $textData = json_encode($inputData, JSON_UNESCAPED_SLASHES);
+        $textFile = $inputData['name'].'_'.$inputData['surname'].'.json';
+        $textDestinationPath = storage_path('app/public/json/');
+
+        File::put($textDestinationPath.$textFile,$textData);
+
+
+        //ADDING IMAGE TO STORAGE
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $image->store('public/images');
+        }
+
+        return redirect('/')->with('success', 'Success, form data stored!');
     }
 
     /**

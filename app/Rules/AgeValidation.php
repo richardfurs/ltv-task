@@ -28,15 +28,10 @@ class AgeValidation implements Rule
     {
         $minAge = date('d/m/Y', strtotime('-18 years'));
 
-        if($value) {
-            $minAgeDate = Carbon::createFromFormat('d/m/Y', $minAge);
-            $valueDate = Carbon::createFromFormat('d/m/Y', $value);
-            return $minAgeDate > $valueDate;
-        } else {
-            return true;
-        }
+        $minAgeDate = Carbon::createFromFormat('d/m/Y', $minAge);
+        $valueDate = Carbon::createFromFormat('d/m/Y', $value);
 
-
+        return $minAgeDate > $valueDate;
     }
 
     /**
@@ -46,6 +41,6 @@ class AgeValidation implements Rule
      */
     public function message()
     {
-        return 'Lai turpinātu, jābūt vismaz 18 gadus vecam';
+        return trans('validation.adult');
     }
 }
